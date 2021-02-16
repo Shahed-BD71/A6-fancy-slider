@@ -1,12 +1,13 @@
 const imagesArea = document.querySelector('.images');
 const gallery = document.querySelector('.gallery');
 const galleryHeader = document.querySelector('.gallery-header');
-const selectUnselectSection = document.querySelector('.num-selected-image');
 const searchBtn = document.getElementById('search-btn');
 const sliderBtn = document.getElementById('create-slider');
 const sliderContainer = document.getElementById('sliders');
 const imageItems = document.getElementsByClassName('single-img');
 const notFoundWarning = document.getElementById("not-found-warning");
+const selectUnselectArea = document.querySelector(".selected-img");
+// const warningArea = document.getElementById("warning-text");
 // selected image 
 let sliders = [];
 
@@ -21,31 +22,28 @@ const showImages = (images) => {
   if (images.length === 0) {
     imagesArea.style.display = 'none';
     notFoundWarning.style.display = 'flex';
-
   }
-  else {
-    imagesArea.style.display = 'block';
-    notFoundWarning.style.display = 'none';
+  else{
+    imagesArea.style.display ="block";
+    notFoundWarning.style.display = "none";
     gallery.innerHTML = '';
-    // show gallery title and Select Options
-    galleryHeader.style.display = 'flex';
-    selectUnselectSection.style.display = 'flex';
-    setSelectedImageNum();
-
-    images.forEach(image => {
-      let div = document.createElement('div');
-      div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
-      div.innerHTML = ` <img class="img-fluid img-thumbnail single-img" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
-      gallery.appendChild(div)
-    })
+  // show gallery title and Select , Unselect Option.
+  galleryHeader.style.display = 'flex';
+  selectUnselectArea.style.display = "flex";
+  selectedImage();
+  images.forEach(image => {
+    let div = document.createElement('div');
+    div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
+    div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
+    gallery.appendChild(div)
+  })
   }
-
-  // Hide spinner
+  // spinner hide
   toggleSpinner();
 }
 
 const getImages = (query) => {
-  // Show Spinner
+  // show spinner
   toggleSpinner();
   fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
     .then(response => response.json())
@@ -55,21 +53,21 @@ const getImages = (query) => {
 
 let slideIndex = 0;
 const selectItem = (event, img) => {
-  let element = event.target;
-  element.classList.toggle('added');
-
+  let slide = event.target;
+  slide.classList.add('added');
+ 
   let item = sliders.indexOf(img);
   if (item === -1) {
     sliders.push(img);
   } else {
-    sliders.splice(item, 1);
+    sliders.splice(item, 1)
   }
-  setSelectedImageNum();
+  selectedImage();
 }
 var timer
 const createSlider = () => {
   // check slider image length
-  if (sliders.length < 5) {
+  if (sliders.length < 10) {
     alert('Select at least 2 image.')
     return;
   }
@@ -86,11 +84,11 @@ const createSlider = () => {
   document.querySelector('.main').style.display = 'block';
   // hide image area
   imagesArea.style.display = 'none';
-  // For zero and Negative Value, Default Value: 1000ms
-  let intervalTime = document.getElementById('duration').value;
-  const duration = (intervalTime <= 0) ? 1000 : intervalTime;
+    // menage negative value
+  let durationTime = document.getElementById('duration').value;
+  const duration = (durationTime <= 0) ? 1000 : durationTime;
   document.getElementById('duration').value = duration;
-
+  // const duration = document.getElementById('duration').value || 1000;
   sliders.forEach(slide => {
     let item = document.createElement('div')
     item.className = "slider-item";
@@ -140,48 +138,48 @@ searchBtn.addEventListener('click', function () {
   sliders.length = 0;
 })
 
-// Enter key Trigger: Search Box
-document.getElementById("search").addEventListener("keyup", event => {
-  if (event.key === "Enter") searchBtn.click();
-});
-
 sliderBtn.addEventListener('click', function () {
   createSlider()
 })
 
-// Enter Key 
-document.getElementById("duration").addEventListener("keyup", event => {
-  if (event.key === "Enter") sliderBtn.click();
+// search box
+document.getElementById("search").addEventListener("keyup", event => {
+  if (event.key === "Enter") searchBtn.click();
 });
 
 const toggleSpinner = () => {
   const spinner = document.getElementById("loading-spinner");
-  spinner.classList.toggle("display-flex");
+  spinner.classList.toggle("display-block");
 }
 
-const setSelectedImageNum = () => {
-  document.getElementById("num-selected-img").innerText = sliders.length;
+const selectedImage = () => {
+  document.getElementById("selected-img-num").innerText = sliders.length;
 }
 
-  // clear selected
-document.getElementById("clear-selected").addEventListener("click", () => {
+document.getElementById("duration").addEventListener("keyup", event => {
+  if (event.key === "Enter") sliderBtn.click();
+});
+
+ //selected all
+ document.getElementById("select-all").addEventListener("click", () => {
   for (let i = 0; i < imageItems.length; i++) {
-    const element = imageItems[i];
-    element.classList.remove("added");
-  }
-  sliders.length = 0;
-  setSelectedImageNum();
-})
-  // all selected
-document.getElementById("all-selected").addEventListener("click", () => {
-  for (let i = 0; i < imageItems.length; i++) {
-    const selected = imageItems[i];
-    selected.classList.add("added");
+    const selectedImg = imageItems[i];
+    selectedImg.classList.add("added");
     const imageSrc = selected.getAttribute('src');
     let item = sliders.indexOf(imageSrc);
     if (item === -1) {
       sliders.push(imageSrc);
     }
   }
-  setSelectedImageNum();
-})
+  selectedImage();
+});
+
+ // Unselect-All
+ document.getElementById("un-select").addEventListener("click", () => {
+  for (let i = 0; i < imageItems.length; i++) {
+    const unSelect = imageItems[i];
+    unSelect.classList.remove("added");
+  }
+  sliders.length = 0;
+  selectedImage();
+});
