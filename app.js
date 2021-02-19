@@ -86,7 +86,7 @@ const createSlider = () => {
   document.querySelector('.main').style.display = 'block';
   // hide image area
   imagesArea.style.display = 'none';
-  // menage negative value, seted value: 1500ms
+  // menage negative value, value: 1500ms
   let intervalTime = document.getElementById('duration').value;
   const duration = (intervalTime <= 0) ? 1500 : intervalTime;
   document.getElementById('duration').value = duration;
